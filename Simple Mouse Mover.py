@@ -1,11 +1,9 @@
-﻿import sys
+import sys
 import subprocess
 import os
 import time
 import traceback # Added for error logging
 
-# --- CRITICAL FIX: Force Working Directory ---
-# When double-clicking, Windows sometimes runs from System32. This fixes it.
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def check_and_install_dependencies():
@@ -62,7 +60,7 @@ check_and_install_dependencies()
 import pydirectinput
 import random
 import threading
-import json  # Added for config file
+import json  # config file
 from pynput import mouse
 from datetime import datetime
 import pyautogui
@@ -70,7 +68,6 @@ import tkinter as tk
 from tkinter import ttk
 
 # --- Configuration Globals ---
-IDLE_THRESHOLD = 5.0    
 last_activity_time = time.time()
 script_enabled = False
 is_script_moving = False 
@@ -92,13 +89,11 @@ listener.start()
 class MouseMoverGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("Mouse Mover v1.0.8")
-        self.root.geometry("500x600") # Increased height slightly for new button
+        self.root.title("Mouse Mover v1.0.9")
+        self.root.geometry("500x600") 
         self.root.resizable(False, False)
         
         # Configuration variables (Defaults)
-        self.min_idle_trigger = tk.DoubleVar(value=8.0)
-        self.max_idle_trigger = tk.DoubleVar(value=20.0)
         self.min_wait_time = tk.DoubleVar(value=25.0)
         self.max_wait_time = tk.DoubleVar(value=45.0)
         self.x_move_limit = tk.IntVar(value=150)
@@ -143,14 +138,7 @@ class MouseMoverGUI:
         settings_frame = ttk.LabelFrame(main_frame, text="Movement Configuration", padding="10")
         settings_frame.grid(row=5, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
         
-        # Idle Trigger Range
-        ttk.Label(settings_frame, text="Idle Trigger (s):").grid(row=0, column=0, sticky=tk.W, pady=2)
-        idle_frame = ttk.Frame(settings_frame)
-        idle_frame.grid(row=0, column=1, sticky=tk.W, pady=2)
-        ttk.Entry(idle_frame, textvariable=self.min_idle_trigger, width=8).pack(side=tk.LEFT, padx=2)
-        ttk.Label(idle_frame, text="to").pack(side=tk.LEFT, padx=2)
-        ttk.Entry(idle_frame, textvariable=self.max_idle_trigger, width=8).pack(side=tk.LEFT, padx=2)
-        
+               
         # Wait Time Range
         ttk.Label(settings_frame, text="Wait Time (s):").grid(row=1, column=0, sticky=tk.W, pady=2)
         wait_frame = ttk.Frame(settings_frame)
@@ -184,7 +172,7 @@ class MouseMoverGUI:
         
         # Log text box with scrollbar
         log_frame = ttk.Frame(main_frame)
-        log_frame.grid(row=8, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
+        log_frame.grid(row=7, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
             
         scrollbar = ttk.Scrollbar(log_frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -203,7 +191,6 @@ class MouseMoverGUI:
     def load_config(self):
         """Loads config from m_cfg.txt or creates defaults."""
         default_config = {
-            "min_idle": 8.0, "max_idle": 20.0,
             "min_wait": 25.0, "max_wait": 45.0,
             "x_limit": 150, "y_limit": 40,
             "min_dur": 0.2, "max_dur": 0.4
@@ -220,8 +207,6 @@ class MouseMoverGUI:
                 data = default_config
 
         # Apply values
-        self.min_idle_trigger.set(data.get("min_idle", 8.0))
-        self.max_idle_trigger.set(data.get("max_idle", 20.0))
         self.min_wait_time.set(data.get("min_wait", 25.0))
         self.max_wait_time.set(data.get("max_wait", 45.0))
         self.x_move_limit.set(data.get("x_limit", 150))
@@ -232,8 +217,6 @@ class MouseMoverGUI:
     def save_current_config(self):
         """Saves current GUI values to file."""
         data = {
-            "min_idle": self.min_idle_trigger.get(),
-            "max_idle": self.max_idle_trigger.get(),
             "min_wait": self.min_wait_time.get(),
             "max_wait": self.max_wait_time.get(),
             "x_limit": self.x_move_limit.get(),
@@ -282,8 +265,8 @@ class MouseMoverGUI:
             if script_enabled:
                 elapsed_idle = time.time() - last_activity_time
                 
-                if elapsed_idle < IDLE_THRESHOLD:
-                    remaining = IDLE_THRESHOLD - elapsed_idle
+                if elapsed_idle < 10:
+                    remaining = 10 - elapsed_idle
                     self.countdown_label.config(
                         text=f"⏸ Movement detected - resuming in {remaining:.1f}s",
                         foreground="orange"
@@ -312,7 +295,7 @@ class MouseMoverGUI:
             if script_enabled:
                 elapsed_idle = time.time() - last_activity_time
                 
-                if elapsed_idle > IDLE_THRESHOLD:
+                if elapsed_idle > 10:
                     self.log_message("!! Status: IDLE. Quick-look triggered...")
                     is_script_moving = True  
                     
@@ -332,7 +315,7 @@ class MouseMoverGUI:
                     
                     is_script_moving = False 
                     
-                    IDLE_THRESHOLD = random.uniform(self.min_idle_trigger.get(), self.max_idle_trigger.get())
+                    IDLE_THRESHOLD = 10
                     sleep_time = random.uniform(self.min_wait_time.get(), self.max_wait_time.get())
                     next_movement_time = time.time() + sleep_time
                     self.log_message(f".. Next Trigger: {round(IDLE_THRESHOLD, 1)}s | Wait: {round(sleep_time, 1)}s")
@@ -354,5 +337,4 @@ if __name__ == "__main__":
         import traceback
         print("\nCRITICAL ERROR:")
         traceback.print_exc()
-
         input("\nPress Enter to exit...")
