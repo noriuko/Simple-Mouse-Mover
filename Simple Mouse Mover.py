@@ -92,7 +92,7 @@ listener.start()
 class MouseMoverGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("Mouse Mover v1.0.7")
+        self.root.title("Mouse Mover v1.0.8")
         self.root.geometry("500x600") # Increased height slightly for new button
         self.root.resizable(False, False)
         
@@ -184,7 +184,7 @@ class MouseMoverGUI:
         
         # Log text box with scrollbar
         log_frame = ttk.Frame(main_frame)
-        log_frame.grid(row=7, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
+        log_frame.grid(row=8, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
             
         scrollbar = ttk.Scrollbar(log_frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -354,4 +354,5 @@ if __name__ == "__main__":
         import traceback
         print("\nCRITICAL ERROR:")
         traceback.print_exc()
+
         input("\nPress Enter to exit...")
