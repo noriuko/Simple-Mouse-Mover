@@ -2,7 +2,7 @@
 A robust, low-level mouse automation tool built in Python, designed to simulate human activity in environments such as DirectX-based games and other applications.
 
 HOW TO USE:
-Simple Mouse Mover v1.0.8
+Simple Mouse Mover
 
 
 📦 Installation & Usage
